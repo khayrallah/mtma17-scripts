@@ -6,11 +6,7 @@
 # * polyglot-de.pkl
 # Leaves a couple pickles for the next script (matrixfoo.py) in there.
 
-from lshash.lshash import LSHash
-from bitarray import bitarray
-from math import cos
 import numpy as np
-from numpy.linalg import norm
 import scipy.spatial.distance
 from collections import defaultdict, Counter
 
@@ -21,16 +17,16 @@ import pickle
 
 def import_polyglot():
 	# Get raw word counts in polyglot corpus
-	if os.path.isfile("../embedding-matrixfoo-files/polyglot-de.wordcounts.pickle"):
-		with open("../embedding-matrixfoo-files/polyglot-de.wordcounts.pickle", 'rb') as f:
+	if os.path.isfile("polyglot-de.wordcounts.pickle"):
+		with open("polyglot-de.wordcounts.pickle", 'rb') as f:
 			casecounter = pickle.load(f)
 	else:
 		casecounter = defaultdict(Counter)
-		with open("../embedding-matrixfoo-files/polyglot-de.full.txt") as f:
+		with open("polyglot-de.full.txt") as f:
 			for line in f.readlines():
 				for word in line.split():
 					casecounter[word.lower()][word] += 1
-		with open("../embedding-matrixfoo-files/polyglot-de.wordcounts.pickle", 'wb') as f:
+		with open("polyglot-de.wordcounts.pickle", 'wb') as f:
 			pickle.dump(casecounter, f)
 	print("Got raw word counts.", file = sys.stderr)
 	
@@ -54,7 +50,7 @@ def import_polyglot():
 	source_words = set()
 	cased_model = {}
 	dims = None
-	with open("../embedding-matrixfoo-files/polyglot-de.pkl", 'rb') as f:
+	with open("polyglot-de.pkl", 'rb') as f:
 		o = pickle.load(f, encoding='latin-1')
 		for (w, e) in zip(o[0], o[1]):
 			if w.lower() in vocab_set:
@@ -107,12 +103,12 @@ def printnns(w):
 		l = nns_truecosin(w)
 		print("\n".join(["{:4.4f} {}".format(s, w) for (s,w) in l]))
 
-if os.path.isfile("../embedding-matrixfoo-files/polyglot-de-embmodel.pickle"):
-	with open("../embedding-matrixfoo-files/polyglot-de-embmodel.pickle", 'rb') as f:
+if os.path.isfile("polyglot-de-embmodel.pickle"):
+	with open("polyglot-de-embmodel.pickle", 'rb') as f:
 		(source_words, model, lsh) = pickle.load(f)
 else:
 	(source_words, model, lsh) = import_polyglot()
-	with open("../embedding-matrixfoo-files/polyglot-de-embmodel.pickle", 'wb') as f:
+	with open("polyglot-de-embmodel.pickle", 'wb') as f:
 		pickle.dump((source_words, model, lsh), f)
 
 printnns('deutschland')
@@ -131,5 +127,5 @@ for (s, w) in sorted(list(zip(deu_sims, X_labels)), reverse = True)[0:5]:
 	print("{:.4f}".format(s), w)
 
 # Cool. Save it for matrixfoo.py.
-with open("../embedding-matrixfoo-files/polyglot-de-cosmatrix.pickle", 'wb') as f:
+with open("polyglot-de-cosmatrix.pickle", 'wb') as f:
 	pickle.dump((X_labels, cosmatrix), f)
