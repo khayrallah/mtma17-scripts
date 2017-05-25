@@ -72,7 +72,7 @@ def import_polyglot():
 			model[lowerword] = np.sum(indivs, axis = 0)
 			assert(len(model[lowerword]) == len(indivs[0]))
 		else:
-			print(f"No entry for »{lowerword}«")
+			print("No entry for »{}«".format(lowerword))
 	print("Got lowercased model.", file = sys.stderr)
 	
 	lsh = LSHash(1024, dims)
@@ -103,9 +103,9 @@ def nns_truecosin(w):
 
 def printnns(w):
 	if w in model:
-		print(f"» {w}")
+		print("»", w)
 		l = nns_truecosin(w)
-		print("\n".join([f"{s:4.4f} {w}" for (s,w) in l]))
+		print("\n".join(["{:4.4f} {}".format(s, w) for (s,w) in l]))
 
 if os.path.isfile("../embedding-matrixfoo-files/polyglot-de-embmodel.pickle"):
 	with open("../embedding-matrixfoo-files/polyglot-de-embmodel.pickle", 'rb') as f:
@@ -128,7 +128,7 @@ print("» deutschland")
 print(cosmatrix[X_labels.index("deutschland")])
 deu_sims = list(cosmatrix[X_labels.index("deutschland")])
 for (s, w) in sorted(list(zip(deu_sims, X_labels)), reverse = True)[0:5]:
-	print(f"{s:.4f} {w}")
+	print("{:.4f}".format(s), w)
 
 # Cool. Save it for matrixfoo.py.
 with open("../embedding-matrixfoo-files/polyglot-de-cosmatrix.pickle", 'wb') as f:
