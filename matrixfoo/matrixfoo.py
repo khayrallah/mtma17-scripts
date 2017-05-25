@@ -13,6 +13,8 @@ import shutil
 import os
 import os.path
 
+lexname = "lexicon.f2e.swap.de-en.200000.pruned-a+e-n5"
+
 def get_toy_matrices():
     vocab_size_s = 4
 
@@ -58,11 +60,10 @@ def get_similarity_matrix():
 
 def get_translation_matrix(X_labels):
     srcdict = {l: i for (i, l) in enumerate(X_labels)}
-    ptpath = "lexicon.f2e.swap.de-en.200000.pruned-a+e-n5"
     # populate target vocab dict
     trgdict = {}
     trgdict_rev = {}
-    with open(ptpath, 'r', encoding='utf-8') as f:
+    with open(lexname, 'r', encoding='utf-8') as f:
         i = 0
         for line in f.read().splitlines():
             l = line.split(" ||| ")
@@ -140,7 +141,7 @@ os.mkdir(dirname)
 
 with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     # Save it (sanity check)
-    export_phrase_table(dirname + "/pt.0", X_labels, trgdict_rev, transmatrix)
+    export_phrase_table(dirname + "/" + lexname + ".smoothed.0", X_labels, trgdict_rev, transmatrix)
     print(translatable_stats(X_labels, transmatrix))
     print(translatable_stats(X_labels, transmatrix), file = lf, flush = True)
     #print("Transmatrix sum:", transmatrix.sum())
@@ -154,7 +155,7 @@ with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
         print(transmatrix.sum(), end='')
         #print(transmatrix)
         end = time.time()
-        export_phrase_table(dirname + "/pt.{}".format(i+1), X_labels, trgdict_rev, transmatrix)
+        export_phrase_table(dirname + "/" + lexname + ".smoothed.{}".format(i+1), X_labels, trgdict_rev, transmatrix)
         print(" ({} s)".format(end - start))
         print(" ({} s)".format(end - start), file = lf, flush = True)
         print(translatable_stats(X_labels, transmatrix))
