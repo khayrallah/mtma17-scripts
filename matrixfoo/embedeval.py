@@ -74,47 +74,30 @@ def import_polyglot():
 				print("No entry for a word containing unicode (damn this cluster)")
 	print("Got lowercased model.", file = sys.stderr)
 	
-	lsh = LSHash(1024, dims)
-	for w in model.keys():
-		lsh.index(model[w], extra_data=w)
-	print("Got hashed.", file = sys.stderr)
-	
 	print("Got all polyglot!", file = sys.stderr)
-	return (source_words, model, lsh)
-
-def nns_hash(w):
-	h1 = bitarray(lsh._hash(lsh.uniform_planes[0], model[w]))
-	cands = []
-	for w2w in model.keys():
-		h2 = bitarray(lsh._hash(lsh.uniform_planes[0], model[w2w]))
-		s = cos(3.141592653589 * float((h1 ^ h2).count()) / float(1024))
-		cands.append((s, w2w))
-	return sorted(cands, reverse=True)[:5]
-
-def nns_truecosin(w):
-	w1 = model[w]
-	cands = []
-	for w2w in model.keys():
-		w2 = model[w2w]
-		#cands.append((1.0 - scipy.spatial.distance.euclidean(w1, w2), w2w))
-		cands.append((1.0 - scipy.spatial.distance.cosine(w1, w2), w2w))
-	return sorted(cands, reverse=True)[:5]
+	return (source_words, model)
 
 def printnns(w):
 	if w in model:
 		print("»", w)
-		l = nns_truecosin(w)
+		w1 = model[w]
+		cands = []
+		for w2w in model.keys():
+			w2 = model[w2w]
+			#cands.append((1.0 - scipy.spatial.distance.euclidean(w1, w2), w2w))
+			cands.append((1.0 - scipy.spatial.distance.cosine(w1, w2), w2w))
+		l = sorted(cands, reverse=True)[:5]
 		print("\n".join(["{:4.4f} {}".format(s, w) for (s,w) in l]))
 
 if os.path.isfile("polyglot-de-embmodel.pickle"):
 	with open("polyglot-de-embmodel.pickle", 'rb') as f:
-		(source_words, model, lsh) = pickle.load(f)
+		(source_words, model) = pickle.load(f)
 else:
 	(source_words, model, lsh) = import_polyglot()
 	with open("polyglot-de-embmodel.pickle", 'wb') as f:
-		pickle.dump((source_words, model, lsh), f)
+		pickle.dump((source_words, model), f)
 
-printnns('deutschland')
+# printnns('deutschland')
 
 X_labels = sorted(list(model.keys()))
 X_vals   = np.array([model[w] for w in X_labels])
@@ -123,11 +106,11 @@ cosmatrix = 1.0 - scipy.spatial.distance.pdist(X_vals, metric='cosine')
 cosmatrix = scipy.spatial.distance.squareform(cosmatrix)
 cosmatrix += np.eye(len(X_labels)) # dunno why this is necessary...
 
-print("» deutschland")
-print(cosmatrix[X_labels.index("deutschland")])
-deu_sims = list(cosmatrix[X_labels.index("deutschland")])
-for (s, w) in sorted(list(zip(deu_sims, X_labels)), reverse = True)[0:5]:
-	print("{:.4f}".format(s), w)
+# print("» deutschland")
+# print(cosmatrix[X_labels.index("deutschland")])
+# deu_sims = list(cosmatrix[X_labels.index("deutschland")])
+# for (s, w) in sorted(list(zip(deu_sims, X_labels)), reverse = True)[0:5]:
+# 	print("{:.4f}".format(s), w)
 
 # Cool. Save it for matrixfoo.py.
 with open("polyglot-de-cosmatrix.pickle", 'wb') as f:
