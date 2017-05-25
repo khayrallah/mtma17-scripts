@@ -3,7 +3,7 @@
 
 # Get phrase tables
 doit () {
-	ln -s /export/b02/huda/experiment/mtma-$dir/model/phrase-table.$1.gz phrase-table.$3.$2.gz
+	ln -s /export/b02/huda/experiment/mtma-$3/model/phrase-table.$1.gz phrase-table.$3.$2.gz
 }
 doit 2 200000 en-de
 doit 3 50000  en-de
@@ -14,7 +14,7 @@ doit 4 20000  de-en
 
 # Get lexicons (e2f only right now)
 doit () {
-	sed 's/ / ||| /g;s/$/ ||| ||| /' /export/b02/huda/experiment/mtma-$dir/model/lex.$1.e2f | gzip > lexicon.e2f.$dir.$2.gz
+	sed 's/ / ||| /g;s/$/ ||| ||| /' /export/b02/huda/experiment/mtma-$3/model/lex.$1.e2f | gzip > lexicon.e2f.$3.$2.gz
 }
 doit 2 200000 en-de
 doit 3 50000  en-de
