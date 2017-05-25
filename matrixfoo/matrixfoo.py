@@ -74,7 +74,7 @@ def get_translation_matrix(X_labels):
                 i += 1
     # construct matrix
     transmatrix = np.zeros((len(srcdict), len(trgdict)))
-    with open(ptpath, 'r', encoding='utf-8') as f:
+    with open(lexname, 'r', encoding='utf-8') as f:
         accept = 0
         discard = 0
         for line in f.read().splitlines():
