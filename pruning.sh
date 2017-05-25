@@ -12,9 +12,17 @@ doit 2 200000 de-en
 doit 5 50000  de-en
 doit 4 20000  de-en
 
-# Get lexicons (e2f only right now)
+# Get lexicons (swapping the f2e so its actually f2e!)
 doit () {
-	sed 's/ / ||| /g;s/$/ ||| ||| /' /export/b02/huda/experiment/mtma-$3/model/lex.$1.e2f | gzip > lexicon.e2f.$3.$2.gz
+	dict="/export/b02/huda/experiment/mtma-$3/model/lex.$1.f2e"
+	for col in 1 2 3; do
+		cut -f $col $dict > tmp.flip$col
+	done
+	paste tmp.flip{2,1,3} \
+		| sed 's/ / ||| /g;s/$/ ||| ||| /' \
+		| gzip \
+		> lexicon.f2e.swap.$3.$2.gz
+	rm tmp.flip{1,2,3}
 }
 doit 2 200000 en-de
 doit 3 50000  en-de
@@ -31,8 +39,8 @@ for ts in 20000 50000 200000; do
 	done
 done
 
-# Prune both w/ significance-based pruning and then manual pruning with n best (n=3)
-n=3
+# Prune both w/ significance-based pruning and then manual pruning with n best
+n=5
 for ts in 20000 50000 200000; do
 	doit () {
 		src=$1

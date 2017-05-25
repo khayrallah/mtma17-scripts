@@ -82,7 +82,7 @@ def get_translation_matrix(X_labels):
     print(f"Read {accept} useful lines and {discard} lines whose source was not accepted.")
     return (trgdict_rev, transmatrix)
 
-pt_export_threshold = 0.001
+pt_export_threshold = 0.0001
 presoftmax_multiplier = 80.0
 softmax = True
 
@@ -130,11 +130,13 @@ os.mkdir(dirname)
 with open(dirname + "/iterations.log", 'w') as lf:
     # Save it (sanity check)
     export_phrase_table(dirname + "/pt.0", X_labels, trgdict_rev, transmatrix)
-    print(translatable_stats(X_labels, transmatrix), file = lf)
+    print(translatable_stats(X_labels, transmatrix))
+    print(translatable_stats(X_labels, transmatrix), file = lf, flush = True)
     #print("Transmatrix sum:", transmatrix.sum())
 
     for i in range(30):
         print(f"Iter {i+1}: ", end='')
+        print(f"Iter {i+1}: ", end='', file = lf, flush = True)
         start = time.time()
         transmatrix = np.dot(cosmatrix, transmatrix)
         #transmatrix /= transmatrix.sum()
@@ -143,4 +145,6 @@ with open(dirname + "/iterations.log", 'w') as lf:
         end = time.time()
         export_phrase_table(dirname + f"/pt.{i+1}", X_labels, trgdict_rev, transmatrix)
         print(f" ({end - start} s)")
-        print(translatable_stats(X_labels, transmatrix), file = lf)
+        print(f" ({end - start} s)", file = lf, flush = True)
+        print(translatable_stats(X_labels, transmatrix))
+        print(translatable_stats(X_labels, transmatrix), file = lf, flush = True)
