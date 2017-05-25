@@ -2,24 +2,26 @@
 # sjmielke@jhu.edu
 
 # Get phrase tables
-for dir in de-en en-de; do
-	doit () {
-		ln -s /export/b02/huda/experiment/mtma-$dir/model/phrase-table.$1.gz phrase-table.$dir.$2.gz
-	}
-	doit 2 200000
-	doit 3 50000
-	doit 4 20000
-done
+doit () {
+	ln -s /export/b02/huda/experiment/mtma-$dir/model/phrase-table.$1.gz phrase-table.$3.$2.gz
+}
+doit 2 200000 en-de
+doit 3 50000  en-de
+doit 4 20000  en-de
+doit 2 200000 de-en
+doit 5 50000  de-en
+doit 4 20000  de-en
 
 # Get lexicons (e2f only right now)
-for dir in de-en en-de; do
-	doit () {
-		sed 's/ / ||| /g;s/$/ ||| ||| /' /export/b02/huda/experiment/mtma-$dir/model/lex.$1.e2f | gzip > lexicon.e2f.$dir.$2.gz
-	}
-	doit 2 200000
-	doit 3 50000
-	doit 4 20000
-done
+doit () {
+	sed 's/ / ||| /g;s/$/ ||| ||| /' /export/b02/huda/experiment/mtma-$dir/model/lex.$1.e2f | gzip > lexicon.e2f.$dir.$2.gz
+}
+doit 2 200000 en-de
+doit 3 50000  en-de
+doit 4 20000  en-de
+doit 2 200000 de-en
+doit 5 50000  de-en
+doit 4 20000  de-en
 
 # Initialize filtering tool
 for ts in 20000 50000 200000; do
