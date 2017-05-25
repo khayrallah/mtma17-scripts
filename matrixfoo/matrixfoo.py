@@ -37,7 +37,7 @@ def get_toy_matrices():
     translation_matrix = np.zeros((vocab_size_s, vocab_size_s))
     
     # Populate initial matrix
-    with open("/home/sjm/documents/MTMA2017/mtma17-scripts/matrixfoo/miniphrasetable") as f:
+    with open("/home/sjm/documents/MTMA2017/mtma17-scripts/matrixfoo/miniphrasetable", encoding='utf-8') as f:
         for line in f.read().splitlines():
             [source, target, score, _] = line.split(" ||| ")
             i_s = wordmap_s[source]
@@ -87,7 +87,7 @@ def get_translation_matrix(X_labels):
             else:
                 #print("Discarded line:", line)
                 discard += 1
-    print(f"Read {accept} useful lines and {discard} lines whose source was not accepted.")
+    print("Read", accept, "useful lines and", discard, "lines whose source was not accepted.")
     return (trgdict_rev, transmatrix)
 
 pt_export_threshold = 0.0001
@@ -95,12 +95,12 @@ presoftmax_multiplier = 80.0
 softmax = True
 
 def export_phrase_table(filename, X_labels, trgdict_rev, translation_matrix):
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         for (w1, transrow) in zip(X_labels, translation_matrix):
             for (i, score) in enumerate(transrow):
                 if score > pt_export_threshold:
                     w2 = trgdict_rev[i]
-                    print(f"{w1} ||| {w2} ||| {score:.7f} ||| ||| ", file = f)
+                    print(w1, "|||", w2, "||| {:.7f} ||| ||| ".format(score), file = f)
 
 # Get similarity matrix
 (X_labels, cosmatrix) = get_similarity_matrix()
@@ -114,22 +114,22 @@ if softmax:
         newmat[i] = np.exp(cosmatrix[i]) / Z
     cosmatrix = newmat
 end = time.time()
-print(f"Similarity matrix softmaxing took {end - start} s")
+print("Similarity matrix softmaxing took", end - start, "s")
 # Get translation matrix
 (trgdict_rev, transmatrix) = get_translation_matrix(X_labels)
 
 def translatable_stats(X_labels, transmatrix):
     words_okay = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row) > 0]
     words_nope = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row) == 0]
-    res = f"{100.0 * len(words_okay) / len(X_labels):.2f}% translatable, {100.0 * len(words_nope) / len(X_labels):2f}% untranslatable\n"
+    res = "{:.2f}% translatable, {:.2f}% untranslatable\n".format(100.0 * len(words_okay) / len(X_labels), 100.0 * len(words_nope) / len(X_labels))
     words_okay = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row > pt_export_threshold) > 0]
     words_nope = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row > pt_export_threshold) == 0]
     pt_export_threshold
-    res += f"{100.0 * len(words_okay) / len(X_labels):.2f}% in phrasetab, {100.0 * len(words_nope) / len(X_labels):2f}% not in phrasetab"
+    res += "{:.2f}% in phrasetab, {:.2f}% not in phrasetab".format(100.0 * len(words_okay) / len(X_labels), 100.0 * len(words_nope) / len(X_labels))
     return res
 
 
-dirname = "runs/" + (f"softmax-{presoftmax_multiplier}-" if softmax else "") + f"prune-below-{pt_export_threshold}"
+dirname = "runs/" + ("softmax-{}-".format(presoftmax_multiplier) if softmax else "") + "prune-below-{}".format(pt_export_threshold)
 
 if not os.path.isdir("runs"):
     os.mkdir("runs")
@@ -138,7 +138,7 @@ if os.path.isdir(dirname):
     shutil.rmtree(dirname)
 os.mkdir(dirname)
 
-with open(dirname + "/iterations.log", 'w') as lf:
+with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     # Save it (sanity check)
     export_phrase_table(dirname + "/pt.0", X_labels, trgdict_rev, transmatrix)
     print(translatable_stats(X_labels, transmatrix))
@@ -146,16 +146,16 @@ with open(dirname + "/iterations.log", 'w') as lf:
     #print("Transmatrix sum:", transmatrix.sum())
 
     for i in range(30):
-        print(f"Iter {i+1}: ", end='')
-        print(f"Iter {i+1}: ", end='', file = lf, flush = True)
+        print("Iter {}: ".format(i+1), end='')
+        print("Iter {}: ".format(i+1), end='', file = lf, flush = True)
         start = time.time()
         transmatrix = np.dot(cosmatrix, transmatrix)
         #transmatrix /= transmatrix.sum()
         print(transmatrix.sum(), end='')
         #print(transmatrix)
         end = time.time()
-        export_phrase_table(dirname + f"/pt.{i+1}", X_labels, trgdict_rev, transmatrix)
-        print(f" ({end - start} s)")
-        print(f" ({end - start} s)", file = lf, flush = True)
+        export_phrase_table(dirname + "/pt.{}".format(i+1), X_labels, trgdict_rev, transmatrix)
+        print(" ({} s)".format(end - start))
+        print(" ({} s)".format(end - start), file = lf, flush = True)
         print(translatable_stats(X_labels, transmatrix))
         print(translatable_stats(X_labels, transmatrix), file = lf, flush = True)
