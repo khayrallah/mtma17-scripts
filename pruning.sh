@@ -45,7 +45,7 @@ for ts in 20000 50000 200000; do
 	doit () {
 		src=$1
 		trg=$2
-		for pmf in lexicon.e2f phrase-table; do
+		for pmf in lexicon.f2e.swap phrase-table; do
 			zcat $pmf.$src-$trg.$ts.gz | /home/smielke/mosesdecoder/contrib/sigtest-filter/filter-pt -e train.$ts.$trg -f train.$ts.$src -l a+e 2> /dev/null | LC_COLLATE=C sort > $pmf.$src-$trg.$ts.pruned-a+e
 python3<<EOF
 newlines = []
