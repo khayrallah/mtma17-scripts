@@ -68,7 +68,10 @@ def import_polyglot():
 			model[lowerword] = np.sum(indivs, axis = 0)
 			assert(len(model[lowerword]) == len(indivs[0]))
 		else:
-			print("No entry for »{}«".format(lowerword))
+			try:
+				print("No entry for »{}«".format(lowerword))
+			except UnicodeEncodeError:
+				print("No entry for a word containing unicode (damn this cluster)")
 	print("Got lowercased model.", file = sys.stderr)
 	
 	lsh = LSHash(1024, dims)
