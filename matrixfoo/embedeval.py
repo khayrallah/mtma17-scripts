@@ -1,3 +1,11 @@
+# Crunching embeddings for a big cosine similarity matrix
+# sjmielke@jhu.edu
+
+# Run in folder with
+# * polyglot-de.full.txt
+# * polyglot-de.pkl
+# Leaves a couple pickles for the next script (matrixfoo.py) in there.
+
 from lshash.lshash import LSHash
 from bitarray import bitarray
 from math import cos
@@ -18,7 +26,7 @@ def import_polyglot():
 			casecounter = pickle.load(f)
 	else:
 		casecounter = defaultdict(Counter)
-		with open('embedding-matrixfoo-files/polyglot-de.full.txt') as f:
+		with open("../embedding-matrixfoo-files/polyglot-de.full.txt") as f:
 			for line in f.readlines():
 				for word in line.split():
 					casecounter[word.lower()][word] += 1

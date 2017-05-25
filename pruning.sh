@@ -16,13 +16,13 @@ doit 4 20000  de-en
 doit () {
 	dict="/export/b02/huda/experiment/mtma-$3/model/lex.$1.f2e"
 	for col in 1 2 3; do
-		cut -f $col $dict > tmp.flip$col
+		cut -d ' ' -f $col $dict > tmp.flip$col
 	done
-	paste tmp.flip{2,1,3} \
+	paste -d ' ' tmp.flip{2,1,3} \
 		| sed 's/ / ||| /g;s/$/ ||| ||| /' \
 		| gzip \
 		> lexicon.f2e.swap.$3.$2.gz
-	rm tmp.flip{1,2,3}
+	#rm tmp.flip{1,2,3}
 }
 doit 2 200000 en-de
 doit 3 50000  en-de

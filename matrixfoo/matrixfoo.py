@@ -1,3 +1,11 @@
+# Smoothen translation table given cosine similarities.
+# sjmielke@jhu.edu
+
+# Run in folder with:
+# * polyglot-de-cosmatrix.pickle
+# * lexicon.f2e.swap.de-en.200000.pruned-a+e-n5
+# Creates a subdir runs with the current iteration run.
+
 import numpy as np
 import time
 import pickle
@@ -44,13 +52,13 @@ def get_random_matrices(size):
     return (translation_matrix, similarity_matrix)
 
 def get_similarity_matrix():
-    with open("../embedding-matrixfoo-files/polyglot-de-cosmatrix.pickle", 'rb') as f:
+    with open("polyglot-de-cosmatrix.pickle", 'rb') as f:
         (X_labels, cosmatrix) = pickle.load(f)
     return (X_labels, cosmatrix)
 
 def get_translation_matrix(X_labels):
     srcdict = {l: i for (i, l) in enumerate(X_labels)}
-    ptpath = "../embedding-matrixfoo-files/lexicon.e2f.de-en.200000.pruned-a+e-n3"
+    ptpath = "lexicon.f2e.swap.de-en.200000.pruned-a+e-n5"
     # populate target vocab dict
     trgdict = {}
     trgdict_rev = {}
@@ -121,7 +129,10 @@ def translatable_stats(X_labels, transmatrix):
     return res
 
 
-dirname = "../embfooruns/" + (f"softmax-{presoftmax_multiplier}-" if softmax else "") + f"prune-below-{pt_export_threshold}"
+dirname = "runs/" + (f"softmax-{presoftmax_multiplier}-" if softmax else "") + f"prune-below-{pt_export_threshold}"
+
+if not os.path.isdir("runs"):
+    os.mkdir("runs")
 
 if os.path.isdir(dirname):
     shutil.rmtree(dirname)
