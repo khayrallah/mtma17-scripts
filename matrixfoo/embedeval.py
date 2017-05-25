@@ -93,7 +93,7 @@ if os.path.isfile("polyglot-de-embmodel.pickle"):
 	with open("polyglot-de-embmodel.pickle", 'rb') as f:
 		(source_words, model) = pickle.load(f)
 else:
-	(source_words, model, lsh) = import_polyglot()
+	(source_words, model) = import_polyglot()
 	with open("polyglot-de-embmodel.pickle", 'wb') as f:
 		pickle.dump((source_words, model), f)
 
