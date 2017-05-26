@@ -195,6 +195,8 @@ if smooth_trg:
 
 if not smooth_src:
     X_labels_src = [w for (i, w) in sorted(list(revdict_src.items()))]
+if smooth_trg:
+    revdict_trg = {i: w for (i, w) in enumerate(X_labels_trg)}
 
 def translatable_stats(X_labels, transmatrix):
     words_okay = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row) > 0]
