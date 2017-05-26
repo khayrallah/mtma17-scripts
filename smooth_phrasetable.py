@@ -29,12 +29,14 @@ smooth_src = True
 smooth_trg = False
 pt_export_threshold = 0.0001
 iters = 30
+vocabsize = 20000
 
 cheat = sys.argv[1] == "cheat"
 smooth_src = sys.argv[2] == "src"
 smooth_trg = sys.argv[3] == "trg"
 pt_export_threshold = float(sys.argv[4])
 iters = int(sys.argv[5])
+vocabsize = int(sys.argv[6])
 
 def get_similarity_matrix(lang):
     if os.path.isfile("polyglot-"+lang+"-cosmatrix.pickle"):
@@ -63,7 +65,7 @@ def get_similarity_matrix(lang):
             tups = []
             for (lcw, d) in casecounter.items():
                 tups.append((sum(d.values()), lcw, d))
-            tups = [(w, d) for (s, w, d) in sorted(tups, reverse = True)[0:20000]]
+            tups = [(w, d) for (s, w, d) in sorted(tups, reverse = True)[0:vocabsize]]
             vocab_set = set([w for (w, d) in tups])
             print("Got overall word counts.", file = sys.stderr)
             
@@ -195,27 +197,45 @@ if os.path.isdir(dirname):
     shutil.rmtree(dirname)
 os.mkdir(dirname)
 
+"""
+0) T := T = T0
+1) T := Ss * T0 * Tt = T1
+   Ss = Ss^2 = Ss2
+   St = St^2 = St2
+2) T := Ss2 * T0 * Tt2 = T2
+   Ss = Ss2^2 = Ss4
+   St = St2^2 = St4
+3) T := Ss4 * T0 * Tt4 = T4
+   Ss = Ss4^2 = Ss8
+   St = St4^2 = Ss8
+4) T := Ss8 * T0 * Tt8 = T8
+   Ss = Ss8^2 = Ss16
+   St = St8^2 = St16
+"""
+
 with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     # Save it (sanity check)
     export_phrase_table(dirname + "/" + lexname + ".smoothed.0", X_labels_src, revdict_trg, transmatrix)
-    print(translatable_stats(X_labels_src, transmatrix))
+    print(translatable_stats(X_labels_src, transmatrix), flush = True)
     print(translatable_stats(X_labels_src, transmatrix), file = lf, flush = True)
-    #print("Transmatrix sum:", transmatrix.sum())
 
     for i in range(iters):
-        print("Iter {}: ".format(i+1), end='')
-        print("Iter {}: ".format(i+1), end='', file = lf, flush = True)
+        print("Iter {}: ".format(2**i), end='', flush = True)
+        print("Iter {}: ".format(2**i), end='', file = lf, flush = True)
         start = time.time()
+        # Calculate current translation matrix
+        transmatrix_iter = transmatrix
         if smooth_src:
-            transmatrix = np.dot(src_simmatrix, transmatrix)
+            transmatrix_iter = np.dot(src_simmatrix, transmatrix_iter)
         if smooth_trg:
-            transmatrix = np.dot(transmatrix, trg_simmatrix)
-        #transmatrix /= transmatrix.sum()
-        print(transmatrix.sum(), end='')
-        #print(transmatrix)
+            transmatrix_iter = np.dot(transmatrix_iter, trg_simmatrix)
+        # Square similarity matrices!
+        src_simmatrix = np.dot(src_simmatrix, src_simmatrix)
+        trg_simmatrix = np.dot(trg_simmatrix, trg_simmatrix)
+        # Give output
         end = time.time()
-        export_phrase_table(dirname + "/" + lexname + ".smoothed.{}".format(i+1), X_labels_src, revdict_trg, transmatrix)
-        print(" ({} s)".format(end - start))
-        print(" ({} s)".format(end - start), file = lf, flush = True)
-        print(translatable_stats(X_labels_src, transmatrix))
-        print(translatable_stats(X_labels_src, transmatrix), file = lf, flush = True)
+        export_phrase_table(dirname + "/" + lexname + ".smoothed.{}".format(2**i), X_labels_src, revdict_trg, transmatrix_iter)
+        print(transmatrix_iter.sum(), "({} s)".format(end - start), flush = True)
+        print(transmatrix_iter.sum(), "({} s)".format(end - start), file = lf, flush = True)
+        print(translatable_stats(X_labels_src, transmatrix_iter), flush = True)
+        print(translatable_stats(X_labels_src, transmatrix_iter), file = lf, flush = True)
