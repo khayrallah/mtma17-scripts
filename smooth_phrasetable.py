@@ -58,7 +58,7 @@ def get_similarity_matrix(lang):
                         for word in line.split():
                             casecounter[word.lower()][word] += 1
                 with open("polyglot-"+lang+".wordcounts.pickle", 'wb') as f:
-                    pickle.dump(casecounter, f)
+                    pickle.dump(casecounter, f, protocol=4)
             print("Got raw word counts.", file = sys.stderr)
             
             # Get list of lowercase-count-tuples
@@ -108,7 +108,7 @@ def get_similarity_matrix(lang):
             print("Got all polyglot!", file = sys.stderr)
             
             with open("polyglot-"+lang+"-embmodel-"+str(vocabsize)+".pickle", 'wb') as f:
-                pickle.dump((source_words, model), f)
+                pickle.dump((source_words, model), f, protocol=4)
 
         X_labels = sorted(list(model.keys()))
         X_vals   = np.array([model[w] for w in X_labels])
@@ -119,7 +119,7 @@ def get_similarity_matrix(lang):
 
         # Cool. Save it for matrixfoo.py.
         with open("polyglot-"+lang+"-cosmatrix-"+str(vocabsize)+".pickle", 'wb') as f:
-            pickle.dump((X_labels, cosmatrix), f)
+            pickle.dump((X_labels, cosmatrix), f, protocol=4)
 
     if softmax:
         simmatrix = np.zeros_like(cosmatrix)
