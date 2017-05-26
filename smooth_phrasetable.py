@@ -39,12 +39,12 @@ iters = int(sys.argv[5])
 vocabsize = int(sys.argv[6])
 
 def get_similarity_matrix(lang):
-    if os.path.isfile("polyglot-"+lang+"-cosmatrix.pickle"):
-        with open("polyglot-"+lang+"-cosmatrix.pickle", 'rb') as f:
+    if os.path.isfile("polyglot-"+lang+"-cosmatrix-"+str(vocabsize)+".pickle"):
+        with open("polyglot-"+lang+"-cosmatrix-"+str(vocabsize)+".pickle", 'rb') as f:
             (X_labels, cosmatrix) = pickle.load(f)
     else:
-        if os.path.isfile("polyglot-"+lang+"-embmodel.pickle"):
-            with open("polyglot-"+lang+"-embmodel.pickle", 'rb') as f:
+        if os.path.isfile("polyglot-"+lang+"-embmodel-"+str(vocabsize)+".pickle"):
+            with open("polyglot-"+lang+"-embmodel-"+str(vocabsize)+".pickle", 'rb') as f:
                 (source_words, model) = pickle.load(f)
         else:
             if os.path.isfile("polyglot-"+lang+".wordcounts.pickle"):
@@ -107,7 +107,7 @@ def get_similarity_matrix(lang):
             
             print("Got all polyglot!", file = sys.stderr)
             
-            with open("polyglot-"+lang+"-embmodel.pickle", 'wb') as f:
+            with open("polyglot-"+lang+"-embmodel-"+str(vocabsize)+".pickle", 'wb') as f:
                 pickle.dump((source_words, model), f)
 
         X_labels = sorted(list(model.keys()))
@@ -118,7 +118,7 @@ def get_similarity_matrix(lang):
         cosmatrix += np.eye(len(X_labels)) # dunno why this is necessary...
 
         # Cool. Save it for matrixfoo.py.
-        with open("polyglot-"+lang+"-cosmatrix.pickle", 'wb') as f:
+        with open("polyglot-"+lang+"-cosmatrix-"+str(vocabsize)+".pickle", 'wb') as f:
             pickle.dump((X_labels, cosmatrix), f)
 
     if softmax:
@@ -129,6 +129,8 @@ def get_similarity_matrix(lang):
             simmatrix[i] = np.exp(cosmatrix[i]) / Z
     else:
         simmatrix = cosmatrix
+    
+    print("Got similarities for", len(X_labels), lang, "embeddings!")
     
     return (X_labels, simmatrix)
 
@@ -187,6 +189,7 @@ def translatable_stats(X_labels, transmatrix):
 dirname = "runs/" \
     + ("cheat_" if cheat else "") \
     + ("softmax-{}_".format(presoftmax_multiplier) if softmax else "") \
+    + "vocab-{}_".format(vocabsize) \
     + "prune-below-{}_".format(pt_export_threshold) \
     + ("src" if smooth_src and not smooth_trg else ("trg" if not smooth_src and smooth_trg else "src-trg"))
 
