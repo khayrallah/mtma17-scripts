@@ -21,12 +21,18 @@ import os.path
 import sys
 
 lexname = "lexicon.f2e.swap.de-en.200000.pruned-a+e-n5"
+presoftmax_multiplier = 80.0
+softmax = True
+
 cheat = True
 smooth_src = "de"
 smooth_trg = None
 pt_export_threshold = 0.0001
-presoftmax_multiplier = 80.0
-softmax = True
+
+cheat = sys.argv[1] == "cheat"
+smooth_src = sys.argv[2] if sys.argv[2] != "None" else None
+smooth_trg = sys.argv[3] if sys.argv[3] != "None" else None
+pt_export_threshold = float(sys.argv[4])
 
 def get_similarity_matrix(lang):
     if os.path.isfile("polyglot-"+lang+"-cosmatrix.pickle"):
@@ -145,7 +151,7 @@ def get_translation_matrix(X_labels_src, X_labels_trg):
                 i += 1
             if not X_labels_trg and target not in trgdict:
                 trgdict[target] = j
-                trgdict_rev[i] = target
+                trgdict_rev[j] = target
                 j += 1
     # construct matrix
     transmatrix = np.zeros((len(srcdict), len(trgdict)))
@@ -185,8 +191,8 @@ if smooth_trg:
 # Get translation matrix
 (revdict_src, revdict_trg, transmatrix) = get_translation_matrix(X_labels_src, X_labels_trg)
 
-X_labels_src = [w for (i, w) in sorted(list(revdict_src.items()))]
-X_labels_trg = [w for (i, w) in sorted(list(revdict_trg.items()))]
+if not smooth_src:
+    X_labels_src = [w for (i, w) in sorted(list(revdict_src.items()))]
 
 def translatable_stats(X_labels, transmatrix):
     words_okay = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row) > 0]
@@ -218,7 +224,7 @@ with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     print(translatable_stats(X_labels_src, transmatrix), file = lf, flush = True)
     #print("Transmatrix sum:", transmatrix.sum())
 
-    for i in range(30):
+    for i in range(100):
         print("Iter {}: ".format(i+1), end='')
         print("Iter {}: ".format(i+1), end='', file = lf, flush = True)
         start = time.time()
