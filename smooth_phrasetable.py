@@ -28,11 +28,13 @@ cheat = True
 smooth_src = "de"
 smooth_trg = None
 pt_export_threshold = 0.0001
+iters = 30
 
 cheat = sys.argv[1] == "cheat"
 smooth_src = sys.argv[2] if sys.argv[2] != "None" else None
 smooth_trg = sys.argv[3] if sys.argv[3] != "None" else None
 pt_export_threshold = float(sys.argv[4])
+iters = int(sys.argv[5])
 
 def get_similarity_matrix(lang):
     if os.path.isfile("polyglot-"+lang+"-cosmatrix.pickle"):
@@ -224,7 +226,7 @@ with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     print(translatable_stats(X_labels_src, transmatrix), file = lf, flush = True)
     #print("Transmatrix sum:", transmatrix.sum())
 
-    for i in range(100):
+    for i in range(iters):
         print("Iter {}: ".format(i+1), end='')
         print("Iter {}: ".format(i+1), end='', file = lf, flush = True)
         start = time.time()
