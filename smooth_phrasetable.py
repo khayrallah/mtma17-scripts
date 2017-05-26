@@ -25,14 +25,14 @@ presoftmax_multiplier = 80.0
 softmax = True
 
 cheat = True
-smooth_src = "de"
-smooth_trg = None
+smooth_src = True
+smooth_trg = False
 pt_export_threshold = 0.0001
 iters = 30
 
 cheat = sys.argv[1] == "cheat"
-smooth_src = sys.argv[2] if sys.argv[2] != "None" else None
-smooth_trg = sys.argv[3] if sys.argv[3] != "None" else None
+smooth_src = sys.argv[2] == "src"
+smooth_trg = sys.argv[3] == "trg"
 pt_export_threshold = float(sys.argv[4])
 iters = int(sys.argv[5])
 
@@ -132,29 +132,10 @@ def get_similarity_matrix(lang):
 
 def get_translation_matrix(X_labels_src, X_labels_trg):
     # populate vocab dicts if necessary
-    srcdict = {}
     srcdict_rev = {}
-    trgdict = {}
     trgdict_rev = {}
-    if X_labels_src:
-        srcdict = {l: i for (i, l) in enumerate(X_labels_src)}
-    if X_labels_trg:
-        trgdict = {l: i for (i, l) in enumerate(X_labels_trg)}
-    with open(lexname, 'r', encoding='utf-8') as f:
-        i = 0
-        j = 0
-        for line in f.read().splitlines():
-            l = line.split(" ||| ")
-            source = l[0]
-            target = l[1]
-            if not X_labels_src and source not in srcdict:
-                srcdict[source] = i
-                srcdict_rev[i] = source
-                i += 1
-            if not X_labels_trg and target not in trgdict:
-                trgdict[target] = j
-                trgdict_rev[j] = target
-                j += 1
+    srcdict = {l: i for (i, l) in enumerate(X_labels_src)}
+    trgdict = {l: i for (i, l) in enumerate(X_labels_trg)}
     # construct matrix
     transmatrix = np.zeros((len(srcdict), len(trgdict)))
     with open(lexname, 'r', encoding='utf-8') as f:
@@ -172,7 +153,7 @@ def get_translation_matrix(X_labels_src, X_labels_trg):
                 #print("Discarded line:", line)
                 discard += 1
     print("Read", accept, "useful lines and", discard, "lines whose source was not accepted.")
-    return (srcdict_rev, trgdict_rev, transmatrix)
+    return transmatrix
 
 def export_phrase_table(filename, X_labels_src, trgdict_rev, translation_matrix):
     with open(filename, 'w', encoding='utf-8') as f:
@@ -183,20 +164,13 @@ def export_phrase_table(filename, X_labels_src, trgdict_rev, translation_matrix)
                     print(w1, "|||", w2, "||| {:.7f} ||| ||| ".format(score), file = f)
 
 # Get similarity matrix
-X_labels_src = None
-X_labels_trg = None
-if smooth_src:
-    (X_labels_src, src_simmatrix) = get_similarity_matrix(smooth_src)
-if smooth_trg:
-    (X_labels_trg, trg_simmatrix) = get_similarity_matrix(smooth_trg)
+(X_labels_src, src_simmatrix) = get_similarity_matrix("de")
+(X_labels_trg, trg_simmatrix) = get_similarity_matrix("en")
 
 # Get translation matrix
-(revdict_src, revdict_trg, transmatrix) = get_translation_matrix(X_labels_src, X_labels_trg)
+transmatrix = get_translation_matrix(X_labels_src, X_labels_trg)
 
-if not smooth_src:
-    X_labels_src = [w for (i, w) in sorted(list(revdict_src.items()))]
-if smooth_trg:
-    revdict_trg = {i: w for (i, w) in enumerate(X_labels_trg)}
+revdict_trg = {i: w for (i, w) in enumerate(X_labels_trg)}
 
 def translatable_stats(X_labels, transmatrix):
     words_okay = [w for w, row in zip(X_labels, transmatrix) if np.count_nonzero(row) > 0]
