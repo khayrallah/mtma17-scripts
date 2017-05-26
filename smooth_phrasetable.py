@@ -198,11 +198,11 @@ def translatable_stats(X_labels, transmatrix):
     res += "{:.2f}% in phrasetab, {:.2f}% not in phrasetab".format(100.0 * len(words_okay) / len(X_labels), 100.0 * len(words_nope) / len(X_labels))
     return res
 
-dirname = "runs/" +
-    ("cheat_" if cheat else "") +
-    ("softmax-{}_".format(presoftmax_multiplier) if softmax else "") +
-    "prune-below-{}_".format(pt_export_threshold) +
-    ("src" if smooth_src and not smooth_trg else ("trg" if not smooth_src and smooth_trg else "src-trg"))
+dirname = "runs/" \
+    + ("cheat_" if cheat else "") \
+    + ("softmax-{}_".format(presoftmax_multiplier) if softmax else "") \
+    + "prune-below-{}_".format(pt_export_threshold) \
+    + ("src" if smooth_src and not smooth_trg else ("trg" if not smooth_src and smooth_trg else "src-trg"))
 
 if not os.path.isdir("runs"):
     os.mkdir("runs")
@@ -213,7 +213,7 @@ os.mkdir(dirname)
 
 with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
     # Save it (sanity check)
-    export_phrase_table(dirname + "/" + lexname + ".smoothed.0", X_labels_src, trgdict_rev, transmatrix)
+    export_phrase_table(dirname + "/" + lexname + ".smoothed.0", X_labels_src, revdict_trg, transmatrix)
     print(translatable_stats(X_labels_src, transmatrix))
     print(translatable_stats(X_labels_src, transmatrix), file = lf, flush = True)
     #print("Transmatrix sum:", transmatrix.sum())
@@ -230,7 +230,7 @@ with open(dirname + "/iterations.log", 'w', encoding='utf-8') as lf:
         print(transmatrix.sum(), end='')
         #print(transmatrix)
         end = time.time()
-        export_phrase_table(dirname + "/" + lexname + ".smoothed.{}".format(i+1), X_labels_src, trgdict_rev, transmatrix)
+        export_phrase_table(dirname + "/" + lexname + ".smoothed.{}".format(i+1), X_labels_src, revdict_trg, transmatrix)
         print(" ({} s)".format(end - start))
         print(" ({} s)".format(end - start), file = lf, flush = True)
         print(translatable_stats(X_labels_src, transmatrix))
