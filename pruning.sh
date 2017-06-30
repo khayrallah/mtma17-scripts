@@ -25,10 +25,7 @@ for col in 1 2 3; do
 done
 
 SWAP_DICT=lexicon.f2e.swap.gz
-paste -d ' ' tmp.flip{2,1,3} \
-	| sed 's/ / ||| /g;s/$/ ||| ||| /' \
-	| gzip \
-	> $SWAP_DICT
+paste -d ' ' tmp.flip{2,1,3} | sed 's/ / ||| /g;s/$/ ||| ||| /' | gzip > $SWAP_DICT
 
 
 
@@ -45,8 +42,6 @@ done
 
 # Prune both w/ significance-based pruning and then manual pruning with n best
 n=5
-
-
 
 
 for FILE in $SWAP_DICT  $PHRASE_TABLE ; do
@@ -73,6 +68,6 @@ for FILE in $SWAP_DICT  $PHRASE_TABLE ; do
 	with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
 	        print('\n'.join(newlines), file=f)
 	EOF
-
 done
 	
+rm tmp*
