@@ -49,33 +49,30 @@ n=5
 
 
 
-# for $FILE in $SWAP_DICT  $PHRASE_TABLE ; do
-# 	zcat $FILE | /home/smielke/mosesdecoder/contrib/sigtest-filter/filter-pt -e train.$TRG -f train.$SRC -l a+e 2> /dev/null | LC_COLLATE=C sort > $FILE.pruned-a+e
-# python3<<EOF
+for FILE in $SWAP_DICT  $PHRASE_TABLE ; do
+	zcat $FILE | /home/smielke/mosesdecoder/contrib/sigtest-filter/filter-pt -e train.$TRG -f train.$SRC -l a+e 2> /dev/null | LC_COLLATE=C sort > $FILE.pruned-a+e
+	python3<<EOF
 
-
-
-
-# 	newlines = []
-# 	with open("$FILE.pruned-a+e", 'r', encoding='utf-8') as f:
-# 	        current_source = None
-# 	        current_group = []
-# 	        for line in f.read().splitlines():
-# 	                l = line.split(" ||| ")
-# 	                source = l[0]
-# 	                target = l[1]
-# 	                score = l[2]
-# 	                if source == current_source:
-# 	                        current_group.append((score, line))
-# 	                elif source != current_source:
-# 	                        newlines += [l for (s,l) in sorted(current_group, reverse=True)[0:$n]]
-# 	                        current_group = []
-# 	                        current_source = source
+	newlines = []
+	with open("$FILE.pruned-a+e", 'r', encoding='utf-8') as f:
+	        current_source = None
+	        current_group = []
+	        for line in f.read().splitlines():
+	                l = line.split(" ||| ")
+	                source = l[0]
+	                target = l[1]
+	                score = l[2]
+	                if source == current_source:
+	                        current_group.append((score, line))
+	                elif source != current_source:
+	                        newlines += [l for (s,l) in sorted(current_group, reverse=True)[0:$n]]
+	                        current_group = []
+	                        current_source = source
 	        
-# 	        newlines += [l for (s,l) in sorted(current_group, reverse=True)[0:$n]]
-# 	with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
-# 	        print('\n'.join(newlines), file=f)
-# 	EOF
+	        newlines += [l for (s,l) in sorted(current_group, reverse=True)[0:$n]]
+	with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
+	        print('\n'.join(newlines), file=f)
+	EOF
 
-# done
+done
 	
