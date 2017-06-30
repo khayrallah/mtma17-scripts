@@ -67,7 +67,7 @@ for FILE in $SWAP_DICT  $PHRASE_TABLE ; do
 	        newlines += [l for (s,l) in sorted(current_group, reverse=True)[0:$n]]
 	with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
 	        print('\n'.join(newlines), file=f)
-	EOF
+EOF
 done
 	
 rm tmp*
