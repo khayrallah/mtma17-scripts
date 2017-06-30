@@ -70,8 +70,8 @@ with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
 EOF
 #get 1st and 3rd colums to turn these into taining data
 
-cat $FILE.pruned-a+e-n$n | awk -F  "|||" '{ print $1 }' > $FILE.pruned-a+e-n$n.$SRC
-cat $FILE.pruned-a+e-n$n | awk -F  "|||" '{ print $3 }' > $FILE.pruned-a+e-n$n.$TRG
+cat $FILE.pruned-a+e-n$n | awk -F" ||| " '{ print $1 }' > $FILE.pruned-a+e-n$n.$SRC
+cat $FILE.pruned-a+e-n$n | awk -F" ||| " '{ print $3 }' > $FILE.pruned-a+e-n$n.$TRG
 
 
 done
