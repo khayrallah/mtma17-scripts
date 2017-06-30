@@ -49,7 +49,7 @@ n=5
 
 
 
-for $FILE in $SWAP_DICT  $PHRASE_TABLE
+for $FILE in $SWAP_DICT  $PHRASE_TABLE ; do
 	zcat $FILE | /home/smielke/mosesdecoder/contrib/sigtest-filter/filter-pt -e train.$TRG -f train.$SRC -l a+e 2> /dev/null | LC_COLLATE=C sort > $FILE.pruned-a+e
 python3<<EOF
 
@@ -78,5 +78,5 @@ python3<<EOF
 	EOF
 
 		done
-	}
+	
 
