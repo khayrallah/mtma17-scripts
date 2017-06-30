@@ -68,6 +68,13 @@ with open("$FILE.pruned-a+e", 'r', encoding='utf-8') as f:
 with open("$FILE.pruned-a+e-n$n", 'w', encoding='utf-8') as f:
         print('\n'.join(newlines), file=f)
 EOF
+#get 1st and 3rd colums to turn these into taining data
+
+cat $FILE.pruned-a+e-n$n | awk '{ print $1 }' > $FILE.pruned-a+e-n$n.$SRC
+cat $FILE.pruned-a+e-n$n | awk '{ print $3 }' > $FILE.pruned-a+e-n$n.$TRG
+
+
 done
 	
 rm tmp*
+
